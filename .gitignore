@@ -3,6 +3,7 @@ Makefile.local
 *.swp
 *tags
 *~
+baseq3_assets
 
 # OS X
 ####################
