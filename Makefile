@@ -39,6 +39,7 @@ VERSION?=1.36
 CLIENTBIN?=ioquake3
 SERVERBIN?=ioq3ded
 BASEGAME?=baseq3
+KLEIN_LIB?=./code/klein/libklein_c.a
 
 ifndef BASEGAME_CFLAGS
 BASEGAME_CFLAGS=
@@ -761,13 +762,13 @@ $(echo_cmd) "TOOLS_CC_DAGCHECK $<"
 $(Q)$(TOOLS_CC) $(TOOLS_CFLAGS) -Wno-unused -o $@ -c $<
 endef
 
-LBURG       = $(B)/tools/lburg/lburg$(TOOLS_BINEXT)
+LBURG       = $(B)/tools/lburg/lburg
 DAGCHECK_C  = $(B)/tools/rcc/dagcheck.c
-Q3RCC       = $(B)/tools/q3rcc$(TOOLS_BINEXT)
-Q3CPP       = $(B)/tools/q3cpp$(TOOLS_BINEXT)
-Q3LCC       = $(B)/tools/q3lcc$(TOOLS_BINEXT)
-Q3ASM       = $(B)/tools/q3asm$(TOOLS_BINEXT)
-STRINGIFY   = $(B)/tools/stringify$(TOOLS_BINEXT)
+Q3RCC       = $(B)/tools/q3rcc
+Q3CPP       = $(B)/tools/q3cpp
+Q3LCC       = $(B)/tools/q3lcc
+Q3ASM       = $(B)/tools/q3asm
+STRINGIFY   = $(B)/tools/stringify
 
 LBURGOBJ= \
   $(B)/tools/lburg/lburg.o \
@@ -867,7 +868,7 @@ $(STRINGIFY): $(TOOLSDIR)/stringify.c
 
 define DO_Q3LCC
 $(echo_cmd) "Q3LCC $<"
-$(Q)$(Q3LCC) $(BASEGAME_CFLAGS) -o $@ $<
+$(Q)$(CXX) $(BASEGAME_CFLAGS) -o $@ $<
 endef
 
 define DO_CGAME_Q3LCC
@@ -1469,8 +1470,8 @@ endif
 ifneq ($(USE_RENDERER_DLOPEN),0)
 $(B)/$(CLIENTBIN)$(FULLBINEXT): $(Q3OBJ) $(LIBSDLMAIN)
 	$(echo_cmd) "LD $@"
-	$(Q)$(CC) $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) $(NOTSHLIBLDFLAGS) \
-		-o $@ $(Q3OBJ) \
+	$(Q)$(CXX) $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) $(NOTSHLIBLDFLAGS) \
+		-o $@ $(Q3OBJ) ${KLEIN_LIB} \
 		$(LIBSDLMAIN) $(CLIENT_LIBS) $(LIBS)
 
 $(B)/renderer_opengl1_$(SHLIBNAME): $(Q3ROBJ) $(JPGOBJ)
@@ -1480,7 +1481,7 @@ $(B)/renderer_opengl1_$(SHLIBNAME): $(Q3ROBJ) $(JPGOBJ)
 
 $(B)/renderer_opengl2_$(SHLIBNAME): $(Q3R2OBJ) $(Q3R2STRINGOBJ) $(JPGOBJ)
 	$(echo_cmd) "LD $@"
-	$(Q)$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(Q3R2OBJ) $(Q3R2STRINGOBJ) $(JPGOBJ) \
+	$(Q)$(CXX) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(Q3R2OBJ) $(Q3R2STRINGOBJ) $(JPGOBJ) ${KLEIN_LIB} \
 		$(THREAD_LIBS) $(LIBSDLMAIN) $(RENDERER_LIBS) $(LIBS)
 else
 $(B)/$(CLIENTBIN)$(FULLBINEXT): $(Q3OBJ) $(Q3ROBJ) $(JPGOBJ) $(LIBSDLMAIN)
@@ -1641,7 +1642,7 @@ endif
 
 $(B)/$(SERVERBIN)$(FULLBINEXT): $(Q3DOBJ)
 	$(echo_cmd) "LD $@"
-	$(Q)$(CC) $(CFLAGS) $(LDFLAGS) $(NOTSHLIBLDFLAGS) -o $@ $(Q3DOBJ) $(LIBS)
+	$(Q)$(CXX) $(CFLAGS) $(LDFLAGS) $(NOTSHLIBLDFLAGS) -o $@ $(Q3DOBJ) ${KLEIN_LIB} $(LIBS)
 
 
 
@@ -2289,3 +2290,15 @@ assets:
 
 run:
 	./build/release-linux-x86_64/ioquake3.x86_64
+
+# Compiles iqouake3 with PGA and installs assets
+pga:
+	@$(MAKE) BUILD_GAME_QVM=0 -j15
+	@$(MAKE) assets
+
+# Cleans, compiles ioquake3 with PGA, installs assets, then runs ioquake
+cpga:
+	@$(MAKE) clean
+	@$(MAKE) BUILD_GAME_QVM=0 -j15
+	@$(MAKE) assets
+	@$(MAKE) run
