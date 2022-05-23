@@ -21,7 +21,8 @@ test: ${OBJS}
 	@$(CC) ${CFLAGS} -o code-qcommon-q_math.o -c ../code/qcommon/q_math.c
 	@$(CC) ${CFLAGS} -o code-qcommon-q_shared.o -c ../code/qcommon/q_shared.c
 	@$(CC) ${CFLAGS} -o ioquake/q_shared_definitions.o -c ioquake/q_shared_definitions.c
-	@$(CXX) unity/unity.o tests/q_shared.spec.o code-qcommon-q_math.o code-qcommon-q_shared.o ioquake/q_shared_definitions.o ${KLEIN_LIB} -lm -o ${OUTPUT}
+	@$(CC) ${CFLAGS} -o ioquake/old_functions.o -c ioquake/old_functions.c
+	@$(CXX) unity/unity.o tests/q_shared.spec.o code-qcommon-q_math.o code-qcommon-q_shared.o ioquake/q_shared_definitions.o ioquake/old_functions.o ${KLEIN_LIB} -lm -o ${OUTPUT}
 	@${MAKE} clean.o
 
 clean.o:

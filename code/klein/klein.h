@@ -163,6 +163,15 @@ extern "C"
     /// Bivector exponential
     kln_motor line_exp(kln_line const* line);
 
+    // * Code below is written by Peter Veen
+
+    // Inner product between a plane and a point
+    kln_line inner_plane_point(kln_plane const *plane, kln_point const *point);
+
+    // Initializes a rotor for a rotation of "ang_rad" radians around the
+    // (x,y,z) vector.
+    void kln_rotor_init(kln_rotor* rotor, float ang_rad, float x, float y, float z);
+
 #if __cplusplus
 }
 #endif
