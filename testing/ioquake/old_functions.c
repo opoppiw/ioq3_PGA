@@ -98,5 +98,37 @@ void old_RotatePointAroundVector( vec3_t dst, const vec3_t dir, const vec3_t poi
 	for ( i = 0; i < 3; i++ ) {
 		dst[i] = rot[i][0] * point[0] + rot[i][1] * point[1] + rot[i][2] * point[2];
 	}
+}
 
+/**
+ * Old version of ProjectPointOnPlane().
+ *
+ * This function projects point 'p' on the plane with normal vector 'normal'
+ * and places the result in 'd'. Note that the plane goes through the origin.
+ *
+ * ! Important: This function contains a mistake. It normalizes 'normal' to get
+ * !            'n', but it should not do that. Because of this, the function
+ * !            only gives correct results if 'normal' has length 1.
+ */
+void old_ProjectPointOnPlane( vec3_t dst, const vec3_t p, const vec3_t normal )
+{
+	float d;
+	vec3_t n;
+	float inv_denom;
+
+	inv_denom =  DotProduct( normal, normal );
+// #ifndef Q3_VM
+// 	assert( Q_fabs(inv_denom) != 0.0f ); // zero vectors get here
+// #endif
+	inv_denom = 1.0f / inv_denom;
+
+	d = DotProduct( normal, p ) * inv_denom;
+
+	n[0] = normal[0] * inv_denom;
+	n[1] = normal[1] * inv_denom;
+	n[2] = normal[2] * inv_denom;
+
+	dst[0] = p[0] - d * n[0];
+	dst[1] = p[1] - d * n[1];
+	dst[2] = p[2] - d * n[2];
 }

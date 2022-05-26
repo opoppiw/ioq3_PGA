@@ -163,14 +163,25 @@ extern "C"
     /// Bivector exponential
     kln_motor line_exp(kln_line const* line);
 
-    // * Code below is written by Peter Veen
+    // * Functions below are written by Peter Veen
 
     // Inner product between a plane and a point
-    kln_line inner_plane_point(kln_plane const *plane, kln_point const *point);
+    kln_line kln_inner_plane_point(kln_plane const *plane, kln_point const *point);
+
+    // Projection of the given point on the given plane
+    kln_point kln_project_point_plane(kln_point const* point, kln_plane const* plane);
 
     // Initializes a rotor for a rotation of "ang_rad" radians around the
     // (x,y,z) vector.
     void kln_rotor_init(kln_rotor* rotor, float ang_rad, float x, float y, float z);
+
+    // Places the x, y, and z coordinates at the first 3 indices, respectively,
+    // of the given "out" float array.
+    void kln_point_xyz(float *out, kln_point* point);
+
+    // Places the x, y, z and w coordinates at the first 4 indices, respectively,
+    // of the given "out" float array. Note that w is the homogeneous coordinate.
+    void kln_point_wxyz(float *out, kln_point* point);
 
 #if __cplusplus
 }

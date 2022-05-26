@@ -302,7 +302,7 @@ qboolean PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const ve
 void RotatePointAroundVector(vec3_t dst, const vec3_t dir, const vec3_t point,
 							 float degrees) {
 	kln_rotor rotor;
-	kln_point input_point;
+	kln_point k_point;
 
 	// ! The rotation performed in this function follows the left-hand rule.
 	// ! To conform with the standard right-hand rule, the "degree" variable
@@ -310,14 +310,10 @@ void RotatePointAroundVector(vec3_t dst, const vec3_t dir, const vec3_t point,
 	degrees = -degrees;
 
 	kln_rotor_init(&rotor, DEG2RAD(degrees), dir[0], dir[1], dir[2]);
-	kln_point_init(&input_point, point[0], point[1], point[2]);
+	kln_point_init(&k_point, point[0], point[1], point[2]);
 
-	kln_point output_point = kln_rotate_point(&rotor, &input_point);
-	float *output_point_p3 = (float *) &output_point.p3;
-
-	dst[0] = output_point_p3[1];
-	dst[1] = output_point_p3[2];
-	dst[2] = output_point_p3[3];
+	k_point = kln_rotate_point(&rotor, &k_point);
+	kln_point_xyz(dst, &k_point);
 }
 
 /**
@@ -420,60 +416,31 @@ void AxisCopy( vec3_t in[3], vec3_t out[3] ) {
 	VectorCopy( in[2], out[2] );
 }
 
-// TODO: Finish this PGA implementation
 /**
- * PGA implementation of ProjectPointOnPlane().
+ * ProjectPointOnPlane().
  *
- * This function projects point 'p' on the plane with normal vector 'normal'
- * and places the result in 'd'. Note that the plane goes through the origin.
- */
-// void ProjectPointOnPlane( vec3_t dst, const vec3_t p, const vec3_t normal ) {
-// 	kln_plane *plane = malloc(sizeof(kln_plane *));
-// 	kln_point *point = malloc(sizeof(kln_point *));
-
-// 	kln_plane_init(plane, normal[0], normal[1], normal[2], 0);
-// 	kln_point_init(point, p[0], p[1], p[2]);
-
-// 	kln_line line = inner_plane_point(plane, point);
-
-
-// 	// fprintf(stderr, "LINE SEEMS TO WORK WHOOP!")
-
-// 	free(plane);
-// 	free(point);
-// }
-
-/**
- * Old version of ProjectPointOnPlane().
+ * This function projects point "p" on the plane with unit normal vector
+ * "normal". The result is placed in "dst".
  *
- * This function projects point 'p' on the plane with normal vector 'normal'
- * and places the result in 'd'. Note that the plane goes through the origin.
- *
- * ! Important: This function contains a mistake. It normalizes 'normal' to get
- * !            'n', but it should not do that. Because of this, the function
- * !            only gives correct results if 'normal' has length 1.
+ * ! Projecting a point on a plane with a non-unit vector requires normalization
+ * ! of the resulting point. To avoid having to normalize, it is assumed that
+ * ! "normal" is a unit normal vector.
+ * 
+ * \param dst Location where the resulting point coordinates are written
+ * \param p Point that is to be projected
+ * \param normal Unit normal vector of the plane
  */
 void ProjectPointOnPlane( vec3_t dst, const vec3_t p, const vec3_t normal )
 {
-	float d;
-	vec3_t n;
-	float inv_denom;
+	kln_point point;
+	kln_plane plane;
 
-	inv_denom =  DotProduct( normal, normal );
-#ifndef Q3_VM
-	assert( Q_fabs(inv_denom) != 0.0f ); // zero vectors get here
-#endif
-	inv_denom = 1.0f / inv_denom;
+	kln_point_init(&point, p[0], p[1], p[2]);
+	kln_plane_init(&plane, normal[0], normal[1], normal[2], 0);
 
-	d = DotProduct( normal, p ) * inv_denom;
+	point = kln_project_point_plane(&point, &plane);
 
-	n[0] = normal[0] * inv_denom;
-	n[1] = normal[1] * inv_denom;
-	n[2] = normal[2] * inv_denom;
-
-	dst[0] = p[0] - d * n[0];
-	dst[1] = p[1] - d * n[1];
-	dst[2] = p[2] - d * n[2];
+	kln_point_xyz(dst, &point);
 }
 
 /*

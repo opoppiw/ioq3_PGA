@@ -24,9 +24,6 @@ void tearDown(void) {
 void test_RotatePointAroundVector(void) {
     #define nr_tests 3
 
-    // ! Using the Klein library, the positive direction of rotation around a vector seems to
-    // ! be determined using the left-hand rule, while I would expect the right-hand rule.
-    // ! The expected results below are those you get using the right-hand rule.
     vec3_t dirs[nr_tests] =         {{0, 10, 0} , {0,1,0}, {0,0,27}};
     vec3_t points[nr_tests] =       {{5, 0, 0}  , {1,0,0}, {3,3,3}};
     vec3_t expecteds[nr_tests] =    {{-5, 0, 0} , {0,0,-1}, {-3,3,3}};
@@ -45,7 +42,6 @@ void test_RotatePointAroundVector(void) {
 test_old_RotatePointAroundVector(void) {
     #define nr_tests 3
 
-    // ! The expected results below are those you get using the right-hand rule.
     vec3_t dirs[nr_tests] =         {{0, 10, 0} , {0,1,0}, {0,0,27}};
     vec3_t points[nr_tests] =       {{5, 0, 0}  , {1,0,0}, {3,3,3}};
     vec3_t expecteds[nr_tests] =    {{-5, 0, 0} , {0,0,-1}, {-3,3,3}};
@@ -54,8 +50,6 @@ test_old_RotatePointAroundVector(void) {
 
     for (int i = 0; i < nr_tests; i++) {
         old_RotatePointAroundVector(result, dirs[i], points[i], degrees[i]);
-        printf("old: result = [%f, %f, %f]\n", result[0], result[1], result[2]); // TODO: REMOVE
-        printf("old: expected = [%f, %f, %f]\n\n", expecteds[i][0], expecteds[i][1], expecteds[i][2]); // TODO: REMOVE
 
         for (int j = 0; j < 3; j++) {
             TEST_ASSERT_FLOAT_WITHIN(float_delta, expecteds[i][j], result[j]);
@@ -63,21 +57,49 @@ test_old_RotatePointAroundVector(void) {
     }
 }
 
-// void test_ProjectPointOnPlane(void) {
-//     vec3_t normal = {1.0, 1.0, 0.0};
-//     vec3_t point = {0.0, 1.0, 0.0};
-//     vec3_t dst;
-//     vec3_t expected_dst = {-0.5, 0.5, 0};
+void test_ProjectPointOnPlane(void) {
+    #define nr_tests 3
 
-//     ProjectPointOnPlane(dst, point, normal);
+    vec3_t result;
+    vec3_t points[nr_tests] =    {{0.0, 0.0, 5.0}, {0.0, 1.0, 0.0}, {3.2, 2.3, 3.3}};
+    vec3_t normals[nr_tests] =   {{0.0, 0.0, 1.0}, {1.0/sqrt(2), 1.0/sqrt(2), 0.0}, {1/sqrt(21), 2/sqrt(21), 4/sqrt(21)}};
+    vec3_t expecteds[nr_tests] = {{0.0, 0.0, 0.0}, {-0.5, 0.5, 0}, {2.2, 0.3, -0.7}};
 
-//     printf("dst: {%f, %f, %f}", dst[0], dst[1], dst[2]);
-// }
+    for (int i = 0; i < nr_tests; i++) {
+        ProjectPointOnPlane(result, points[i], normals[i]);
+
+        for (int j = 0; j < 3; j++) {
+            TEST_ASSERT_FLOAT_WITHIN(float_delta, expecteds[i][j], result[j]);
+        }
+    }
+}
+
+void test_old_ProjectPointOnPlane(void) {
+    #define nr_tests 3
+
+    vec3_t result;
+    vec3_t points[nr_tests] =    {{0.0, 0.0, 5.0}, {0.0, 1.0, 0.0}, {3.2, 2.3, 3.3}};
+    vec3_t normals[nr_tests] =   {{0.0, 0.0, 1.0}, {1.0/sqrt(2), 1.0/sqrt(2), 0.0}, {1/sqrt(21), 2/sqrt(21), 4/sqrt(21)}};
+    vec3_t expecteds[nr_tests] = {{0.0, 0.0, 0.0}, {-0.5, 0.5, 0}, {2.2, 0.3, -0.7}};
+
+    for (int i = 0; i < nr_tests; i++) {
+        old_ProjectPointOnPlane(result, points[i], normals[i]);
+
+        for (int j = 0; j < 3; j++) {
+            TEST_ASSERT_FLOAT_WITHIN(float_delta, expecteds[i][j], result[j]);
+        }
+    }
+}
+
 
 // not needed when using generate_test_runner.rb
 int main(void) {
     UNITY_BEGIN();
+
     RUN_TEST(test_RotatePointAroundVector);
-    RUN_TEST(test_old_RotatePointAroundVector);
+    RUN_TEST(test_ProjectPointOnPlane);
+    RUN_TEST(test_old_ProjectPointOnPlane);
+    // RUN_TEST(test_old_RotatePointAroundVector); // ! Fails
+
     return UNITY_END();
 }
