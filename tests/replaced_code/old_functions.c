@@ -81,9 +81,9 @@ void old_RotatePointAroundVector( vec3_t dst, const vec3_t dir, const vec3_t poi
 	zrot[1][1] = cos( rad );
 
 	/**
-	 *        | cos(rad) -sin(rad) 0 |
-	 * zrot = | sin(rad) cos(rad)  0 |
-	 *        | 0        0         1 |
+	 *        | cos(rad)  sin(rad)  0 |
+	 * zrot = | -sin(rad) cos(rad)  0 |
+	 *        | 0         0         1 |
 	 */
 
 	MatrixMultiply( m, zrot, tmpmat );
@@ -91,7 +91,7 @@ void old_RotatePointAroundVector( vec3_t dst, const vec3_t dir, const vec3_t poi
 
 	/**
 	 *
-	 * rot = m * zrot * im = m * zrot * m^T
+	 * rot = m * zrot * im = m * zrot * m^T = m * zrot * m^(-1)
 	 *
 	 */
 

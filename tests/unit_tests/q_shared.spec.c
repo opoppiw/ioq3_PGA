@@ -6,10 +6,11 @@
  * WORK IN PROGRESS
  */
 
-#include "../unity/unity.h"
+#include "unity/unity.h"
 #include "../../code/qcommon/q_shared.h"
-#include "../ioquake/old_functions.h"
+#include "../replaced_code/old_functions.h"
 #include <stdio.h>
+
 
 #define float_delta 0.00001 // The maximum difference for two floats to be considered equal
 
@@ -42,7 +43,7 @@ void test_RotatePointAroundVector(void) {
 test_old_RotatePointAroundVector(void) {
     #define nr_tests 3
 
-    vec3_t dirs[nr_tests] =         {{0, 10, 0} , {0,1,0}, {0,0,27}};
+    vec3_t dirs[nr_tests] =         {{0, 50, 0} , {0,1,0}, {0,0,1}};
     vec3_t points[nr_tests] =       {{5, 0, 0}  , {1,0,0}, {3,3,3}};
     vec3_t expecteds[nr_tests] =    {{-5, 0, 0} , {0,0,-1}, {-3,3,3}};
     float degrees[nr_tests] =       {180        , 90      , 90};
@@ -91,15 +92,35 @@ void test_old_ProjectPointOnPlane(void) {
     }
 }
 
+/**
+ * roll: rotation around x-axis
+ * pitch: rotation around y-axis
+ * yaw: rotation around z-axis.
+ */
+void test_vectoangles(void) {
+    vec3_t angles;
+    vec3_t vec = {5, -2, 5};
 
-// not needed when using generate_test_runner.rb
+    vectoangles(vec, angles);
+    printf("Angles: roll(x)=%f, pitch(y)=%f, yaw(z)=%f\n", angles[ROLL], angles[PITCH], angles[YAW]);
+}
+
 int main(void) {
     UNITY_BEGIN();
 
-    RUN_TEST(test_RotatePointAroundVector);
-    RUN_TEST(test_ProjectPointOnPlane);
-    RUN_TEST(test_old_ProjectPointOnPlane);
-    // RUN_TEST(test_old_RotatePointAroundVector); // ! Fails
+    // vec3_t vf = {0, 0, 1};
+    // vec3_t vr;
+    // PerpendicularVector(&vr, &vf);
+
+    // printf("vr = [%f, %f, %f]\n", vr[0], vr[1], vr[2]);
+
+    // RUN_TEST(test_RotatePointAroundVector);
+    // RUN_TEST(test_ProjectPointOnPlane);
+    // RUN_TEST(test_old_ProjectPointOnPlane);
+
+    // RUN_TEST(test_vectoangles);
+
+    RUN_TEST(test_old_RotatePointAroundVector); // ! Fails
 
     return UNITY_END();
 }
