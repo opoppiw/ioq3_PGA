@@ -9,8 +9,6 @@
 typedef float vec3_t[3];
 
 /**
- * rand_point
- *
  * Returns a random 3D point.
  * The elements of this point will be in the range [0.0, 2147.483647]
  */
@@ -23,8 +21,6 @@ kln::point rand_point() {
 }
 
 /**
- * rand_origin_unit_plane
- *
  * Returns a random 3D unit plane through the origin.
  */
 kln::plane rand_origin_unit_plane() {
@@ -39,8 +35,6 @@ kln::plane rand_origin_unit_plane() {
 }
 
 /**
- * rand_unit_vectors
- * 
  * Generates a given number of random 3D unit vectors and writes the results to "vectors".
  * 
  * @param vectors Array consisting of "nr" float arrays of size 3. 
@@ -60,22 +54,21 @@ void rand_unit_vectors(vec3_t *vectors, int nr) {
 }
 
 /**
- * rand_degree
- *
  * Fills the given array with the indicated number of floats.
  * Returns a random floats in the range [0.0, 858.9934588]
  *
  * @param angles Float array where the results are written to.
  * @param nr The number of floats that are generated
  */
-float rand_angles(float *angles, int nr)
+void rand_angles(float *angles, int nr)
 {
-  return (float)(rand()) / 2500000;
+  for (int i = 0; i < nr; i++)
+  {
+    angles[i] = (float)(rand()) / 2500000;
+  }
 }
 
 /**
- * test_ProjectPointOnPlane
- * 
  * Performs Klein library project function for projecting a random points
  * on a random unit plane through the origin a configured number of times.
  * a configured number. The execution time is measured and printed.
@@ -107,8 +100,6 @@ void test_ProjectPointOnPlane(void) {
 }
 
 /**
- * test_ProjectPointOnPlane
- *
  * Constructs a rotor using a direction vector and applies this rotor
  * to a given point a configured number of times. The execution time is
  * measured and printed.
@@ -139,7 +130,7 @@ void test_RotatePointAroundVector(void)
 
   t = clock() - t;
   time_taken = ((double)t) / CLOCKS_PER_SEC * 1000;
-  printf("PGA version took %f ms to execute \n", time_taken);
+  printf("PGA C++ version took %f ms to execute \n", time_taken);
 }
 
 int main() {

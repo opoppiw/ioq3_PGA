@@ -12,8 +12,6 @@
 #define nr_tests 200000
 
 /**
- * rand_vector
- *
  * Generates a random 3D vector.
  * The elements of this vector will be in the range [0.0, 2147.483647]
  *
@@ -26,8 +24,6 @@ void rand_vector(vec3_t vector) {
 }
 
 /**
- * rand_vectors
- *
  * Generates a given number of random 3D vectors and writes the results to "vectors".
  * The elements of these vectors will be in the range [0.0, 2147.483647]
  *
@@ -41,8 +37,6 @@ void rand_vectors(vec3_t* vectors, int nr) {
 }
 
 /**
- * rand_unit_vector
- * 
  * Generates a random 3D unit vector.
  * 
  * @param vector Array of size 3 where the result is written.
@@ -58,8 +52,6 @@ void rand_unit_vector(vec3_t vector) {
 }
 
 /**
- * rand_unit_vectors
- * 
  * Generates a given number of random 3D unit vectors and writes the results to "vectors".
  * 
  * @param vectors Array consisting of "nr" float arrays of size 3. 
@@ -73,8 +65,6 @@ void rand_unit_vectors(vec3_t* vectors, int nr) {
 
 
 /**
- * rand_degree
- * 
  * Fills the given array with the indicated number of floats.
  * Returns a random floats in the range [0.0, 858.9934588] 
  * 
@@ -88,8 +78,6 @@ void rand_angles(float* angles, int nr) {
 }
 
 /**
- * test_ProjectPointOnPlane
- * 
  * Executes the Ioquake and PGA version of the ProjectPointOnPlane function for a configured 
  * number of random unit vector inputs. For each version of ProjectPointOnPlane, the total 
  * execution time of executing ProjectPointOnPlane for all generated inputs is measured and 
@@ -127,8 +115,6 @@ void test_ProjectPointOnPlane(void) {
 }
 
 /**
- * test_RotatePointAroundVector
- *
  * Executes the Ioquake and PGA version of the RotatePointAroundVector function for a configured
  * number of random unit vector inputs. For each version of RotatePointAroundVector, the total
  * execution time of executing RotatePointAroundVector for all generated inputs is measured and
@@ -170,8 +156,6 @@ void test_RotatePointAroundVector(void)
 }
 
 /**
- * test_CM_TransformedPointContents
- *
  * Executes the Ioquake and PGA version of the CM_TransformedPointContents function for a 
  * configured number of random inputs. For both version of the function, the total execution 
  * time for all generated inputs is measured and printed.
