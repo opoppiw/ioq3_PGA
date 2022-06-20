@@ -9,6 +9,16 @@
                    |                                       |
                    `--------- https://ioquake3.org --------'
 
+# Ioquake3 with PGA incorporation
+A clone of the Ioquake3 game engine: https://github.com/ioquake/ioq3/. This repository is used to test the effects of incorporating Plane-based Geometric Algebra (PGA) in this game engine. For doing this, the Klein library is used: https://github.com/jeremyong/klein/.
+
+The following functions have been replaced by PGA implementations:
+* code/qcommon/q_math.c: ProjectPointOnPlane, RotatePointAroundVector
+* code/qcommon/cm_test.c: CM_TransformedPointContents
+
+Unit tests and performance tests have been added to the tests directory.
+
+# Ioquake3
 The intent of this project is to provide a baseline Quake 3 which may be used
 for further development and baseq3 fun.
 Some of the major features currently implemented are:
