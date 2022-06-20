@@ -13,10 +13,11 @@ performance:
 	@echo "CC q_shared.performance.c"
 	@${CC} ${CFLAGS} -o ${TEST_DIR}/q_shared.performance.o -c ${TEST_DIR}/q_shared.performance.c
 	@$(CC) ${CFLAGS} -o ${TEST_DIR}/code-qcommon-q_math.o -c ${CODE_DIR}/qcommon/q_math.c
+	@$(CC) ${CFLAGS} -o ${TEST_DIR}/code-qcommon-cm_test.o -c ${CODE_DIR}/qcommon/cm_test.c
 	@$(CC) ${CFLAGS} -o ${TEST_DIR}/code-qcommon-q_shared.o -c ${CODE_DIR}/qcommon/q_shared.c
 	@$(CC) ${CFLAGS} -o ${REPL_CODE_DIR}/q_shared_definitions.o -c ${REPL_CODE_DIR}/q_shared_definitions.c
 	@$(CC) ${CFLAGS} -o ${REPL_CODE_DIR}/old_functions.o -c ${REPL_CODE_DIR}/old_functions.c
-	@${CXX} ${TEST_DIR}/q_shared.performance.o ${TEST_DIR}/code-qcommon-q_math.o ${TEST_DIR}/code-qcommon-q_shared.o ${REPL_CODE_DIR}/q_shared_definitions.o ${REPL_CODE_DIR}/old_functions.o ${KLEIN_LIB} -lm -o ${OUTPUT}
+	@${CXX} ${TEST_DIR}/q_shared.performance.o ${TEST_DIR}/code-qcommon-q_math.o ${TEST_DIR}/code-qcommon-cm_test.o ${TEST_DIR}/code-qcommon-q_shared.o ${REPL_CODE_DIR}/q_shared_definitions.o ${REPL_CODE_DIR}/old_functions.o ${KLEIN_LIB} -lm -o ${OUTPUT}
 	@${MAKE} clean.o
 
 cpp:

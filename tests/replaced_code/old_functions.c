@@ -7,6 +7,7 @@
  */
 
 #include "old_functions.h"
+#include "../../code/qcommon/cm_local.h"
 
 /*
 ===============
@@ -131,4 +132,36 @@ void old_ProjectPointOnPlane( vec3_t dst, const vec3_t p, const vec3_t normal )
 	dst[0] = p[0] - d * n[0];
 	dst[1] = p[1] - d * n[1];
 	dst[2] = p[2] - d * n[2];
+}
+
+/*
+==================
+CM_TransformedPointContents
+
+Handles offseting and rotation of the end points for moving and
+rotating entities
+==================
+*/
+int old_CM_TransformedPointContents(const vec3_t p, clipHandle_t model, const vec3_t origin, const vec3_t angles)
+{
+	vec3_t p_l;
+	vec3_t temp;
+	vec3_t forward, right, up;
+
+	// subtract origin offset
+	VectorSubtract(p, origin, p_l);
+
+	// rotate start and end into the models frame of reference
+	if (model != BOX_MODEL_HANDLE &&
+		(angles[0] || angles[1] || angles[2]))
+	{
+		AngleVectors(angles, forward, right, up);
+
+		VectorCopy(p_l, temp);
+		p_l[0] = DotProduct(temp, forward);
+		p_l[1] = -DotProduct(temp, right);
+		p_l[2] = DotProduct(temp, up);
+	}
+
+	return CM_PointContents(p_l, model);
 }

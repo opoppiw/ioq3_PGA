@@ -66,6 +66,13 @@ extern "C"
         __m128 p2;
     } kln_motor;
 
+    typedef struct
+    {
+        float roll;  // Rotation about x
+        float pitch; // Rotation about y
+        float yaw;   // Rotation about z
+    } kln_euler_angles;
+
     // INITIALIZATION ROUTINES
 
     /// Initialize a given plane to the quantity $a\mathbf{e}_1 + b\mathbf{e}_2 +\
@@ -165,23 +172,47 @@ extern "C"
 
     // * Functions below are written by Peter Veen
 
-    // Inner product between a plane and a point
+    /**
+     * Returns the inner product on a plane and a point.
+     */
     kln_line kln_inner_plane_point(kln_plane const *plane, kln_point const *point);
 
-    // Projection of the given point on the given plane
+    /**
+     * Returns the orthogonal projection of a point on a plane.
+     */
     kln_point kln_project_point_plane(kln_point const* point, kln_plane const* plane);
 
-    // Initializes a rotor for a rotation of "ang_rad" radians around the
-    // (x,y,z) vector.
+    /**
+     * Initializes a rotor such that it encodes a rotation of "ang_rad" radians
+     * around vector (x,y,z).
+     */
     void kln_rotor_init(kln_rotor* rotor, float ang_rad, float x, float y, float z);
 
-    // Places the x, y, and z coordinates at the first 3 indices, respectively,
-    // of the given "out" float array.
+    /**
+     * Initializes a rotor using the given Euler angles.
+     */
+    void kln_rotor_init_ea(kln_rotor* rotor, kln_euler_angles* ea);
+
+    /**
+     * Returns the Euler angles corresponding to the rotation encoded
+     * by the given rotor.
+     */
+    kln_euler_angles kln_rotor_as_ea(kln_rotor* rotor);
+
+    /**
+     * Places the x, y and z coordinates of the given point at the first three
+     * indices of the given float array, respectively.
+     */
     void kln_point_xyz(float *out, kln_point* point);
 
-    // Places the x, y, z and w coordinates at the first 4 indices, respectively,
-    // of the given "out" float array. Note that w is the homogeneous coordinate.
+    /**
+     * Places the x, y, z and w coordinates of the given point at the first
+     * three indices of the given float array, respectively. 
+     * Note that w is the homogeneous coordinate.
+     */
     void kln_point_wxyz(float *out, kln_point* point);
+
+
 
 #if __cplusplus
 }

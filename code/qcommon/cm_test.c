@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 #include "cm_local.h"
-
+#include "../klein/klein.h"
 
 /*
 ==================
@@ -272,38 +272,49 @@ int CM_PointContents( const vec3_t p, clipHandle_t model ) {
 	return contents;
 }
 
-/*
-==================
-CM_TransformedPointContents
+/**
+ * CM_TransformedPointContents
+ * 
+ * PGA implementation of CM_TransformedPointContents
+ *
+ * @param p Target point
+ * @param model Used as argument for CM_ClipHandleToModel()
+ * @param origin Origin offset that is subtract from point "p"
+ * @param angles Euler angles that encode the rotation performed on point "p"
+ * @return int Contents of the transformed point "p"
+ */
+int CM_TransformedPointContents(const vec3_t p, clipHandle_t model, const vec3_t origin, const vec3_t angles)
+{
+	vec3_t p_l;
+	vec3_t temp;
+	vec3_t forward, right, up;
+	kln_point point;
+	kln_rotor rotor;
+	kln_euler_angles ea;
 
-Handles offseting and rotation of the end points for moving and
-rotating entities
-==================
-*/
-int	CM_TransformedPointContents( const vec3_t p, clipHandle_t model, const vec3_t origin, const vec3_t angles) {
-	vec3_t		p_l;
-	vec3_t		temp;
-	vec3_t		forward, right, up;
+	// Subtract origin offset
+	VectorSubtract(p, origin, p_l);
 
-	// subtract origin offset
-	VectorSubtract (p, origin, p_l);
-
-	// rotate start and end into the models frame of reference
-	if ( model != BOX_MODEL_HANDLE && 
-	(angles[0] || angles[1] || angles[2]) )
+	// Rotate start and end into the models frame of reference
+	if (model != BOX_MODEL_HANDLE &&
+		(angles[0] || angles[1] || angles[2]))
 	{
-		AngleVectors (angles, forward, right, up);
+		ea = (kln_euler_angles){ 
+			.roll = DEG2RAD(angles[ROLL]), 
+			.pitch = DEG2RAD(angles[PITCH]), 
+			.yaw = DEG2RAD(angles[YAW]) 
+		};
+		
+		kln_rotor_init_ea(&rotor, &ea);
+		kln_point_init(&point, p_l[0], p_l[1], p_l[2]);
 
-		VectorCopy (p_l, temp);
-		p_l[0] = DotProduct (temp, forward);
-		p_l[1] = -DotProduct (temp, right);
-		p_l[2] = DotProduct (temp, up);
+		point = kln_rotate_point(&rotor, &point);
+
+		kln_point_xyz(p_l, &point);
 	}
 
-	return CM_PointContents( p_l, model );
+	return CM_PointContents(p_l, model);
 }
-
-
 
 /*
 ===============================================================================
