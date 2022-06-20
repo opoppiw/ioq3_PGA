@@ -147,13 +147,6 @@ vec3_t	bytedirs[NUMVERTEXNORMALS] =
 
 //==============================================================
 
-// TODO: Remove
-void print__m128(__m128 var) {
-	float val[4];
-	memcpy(val, &var, sizeof(val));
-	fprintf(stderr, "__m128 value: %f %f %f %f\n", val[0], val[1], val[2], val[3]);
-}
-
 int Q_rand( int *seed ) {
 	*seed = (69069U * *seed + 1U);
 	return *seed;
