@@ -9,7 +9,7 @@
  * The number of executions that will be performed on random inputs
  * for each experiment.
  */
-#define nr_tests 200000
+#define nr_tests 100000
 
 /**
  * Generates a random 3D vector.

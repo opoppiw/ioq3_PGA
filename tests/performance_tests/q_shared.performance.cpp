@@ -3,7 +3,8 @@
 #include "../../../klein/public/klein/klein.hpp"
 #include <xmmintrin.h>
 
-#define nr_tests 200000
+#define nr_tests 100000
+
 #define DEG2RAD(a) (((a)*M_PI) / 180.0F)
 #define BOX_MODEL_HANDLE 255
 
@@ -87,11 +88,9 @@ void rand_angles(float *angles, int nr)
  */
 void rand_euler_angles(kln::euler_angles* ea_array, int nr) {
   for (int i = 0; i < nr; i++) {
-    ea_array[i] = {
-      .roll = (float) DEG2RAD(rand_angle()),
-      .pitch = (float) DEG2RAD(rand_angle()),
-      .yaw =  (float) DEG2RAD(rand_angle()) 
-    }; 
+    ea_array[i].roll = (float)DEG2RAD(rand_angle());
+    ea_array[i].pitch = (float)DEG2RAD(rand_angle());
+    ea_array[i].yaw = (float)DEG2RAD(rand_angle());
   }
 }
 
@@ -206,7 +205,8 @@ void test_CM_TransformedPointContents(void)
   clock_t t;
   double time_taken;
 
-  clipHandle_t model = 5; // The value of "model" does not matter for testing purposes.
+  // The value of "model" does not matter for testing purposes.
+  clipHandle_t model = 5; 
 
   for (int i = 0; i < nr_tests; i++)
   {
