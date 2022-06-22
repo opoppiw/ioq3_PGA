@@ -286,8 +286,6 @@ int CM_PointContents( const vec3_t p, clipHandle_t model ) {
 int CM_TransformedPointContents(const vec3_t p, clipHandle_t model, const vec3_t origin, const vec3_t angles)
 {
 	vec3_t p_l;
-	vec3_t temp;
-	vec3_t forward, right, up;
 	kln_point point;
 	kln_rotor rotor;
 	kln_euler_angles ea;
@@ -304,7 +302,7 @@ int CM_TransformedPointContents(const vec3_t p, clipHandle_t model, const vec3_t
 			.pitch = DEG2RAD(angles[PITCH]), 
 			.yaw = DEG2RAD(angles[YAW]) 
 		};
-		
+
 		kln_rotor_init_ea(&rotor, &ea);
 		kln_point_init(&point, p_l[0], p_l[1], p_l[2]);
 

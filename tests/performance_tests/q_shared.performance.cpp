@@ -5,7 +5,9 @@
 
 #define nr_tests 200000
 #define DEG2RAD(a) (((a)*M_PI) / 180.0F)
+#define BOX_MODEL_HANDLE 255
 
+typedef int clipHandle_t;
 typedef float vec3_t[3];
 
 /**
@@ -54,18 +56,75 @@ void rand_unit_vectors(vec3_t *vectors, int nr) {
 }
 
 /**
+ * Returns a random float in the range [0.0, 858.9934588].
+ * @return float Float in the range [0.0, 858.9934588].
+ */
+float rand_angle() {
+  return (float)(rand()) / 2500000;
+}
+
+/**
  * Fills the given array with the indicated number of floats.
- * Returns a random floats in the range [0.0, 858.9934588]
+ * Returns a random floats in the range [0.0, 858.9934588].
  *
  * @param angles Float array where the results are written to.
- * @param nr The number of floats that are generated
+ * @param nr The number of floats that are generated.
  */
 void rand_angles(float *angles, int nr)
 {
-  for (int i = 0; i < nr; i++)
-  {
-    angles[i] = (float)(rand()) / 2500000;
+  for (int i = 0; i < nr; i++) {
+    angles[i] = rand_angle();
   }
+}
+
+/**
+ * Fills the given array with randomly generated
+ * euler_angle structs. The angles in these structs 
+ * have unit radians.
+ *
+ * @param angles Array where the results are written to.
+ * @param nr The number of euler_angle structs that are generated.
+ */
+void rand_euler_angles(kln::euler_angles* ea_array, int nr) {
+  for (int i = 0; i < nr; i++) {
+    ea_array[i] = {
+      .roll = (float) DEG2RAD(rand_angle()),
+      .pitch = (float) DEG2RAD(rand_angle()),
+      .yaw =  (float) DEG2RAD(rand_angle()) 
+    }; 
+  }
+}
+
+/**
+ * During the performace tests, the original CM_PointContents
+ * returns zero because the map is not loaded.
+ */
+int cpp_CM_PointContents(const kln::point point, clipHandle_t model) {
+  return 0;
+}
+
+/**
+ * A direct copy of the PGA implementation of CM_TransformedPointContents, except
+ * for the use of Klein library C++ data types instead of Ioquake3 C data types.
+ */
+int cpp_CM_TransformedPointContents(const kln::point point, clipHandle_t model, 
+  const kln::point origin, const kln::euler_angles ea) {
+    kln::rotor rotor;
+    kln::point new_point;
+
+    // This simulates the VectorSubtract that is done in the original 
+    // CM_TransformedPointContents.
+    new_point = kln::point(point.x() - origin.x(), point.y() - origin.y(), 
+                           point.z() - origin.z());
+
+    if (model != BOX_MODEL_HANDLE && 
+      (ea.roll || ea.pitch || ea.yaw)) {
+      rotor = kln::rotor(ea);
+
+      new_point = rotor(new_point);
+    }
+
+    return cpp_CM_PointContents(new_point, model);
 }
 
 /**
@@ -74,9 +133,12 @@ void rand_angles(float *angles, int nr)
  * a configured number. The execution time is measured and printed.
  */
 void test_ProjectPointOnPlane(void) {
-  kln::point result;
   kln::point points[nr_tests];
   kln::plane planes[nr_tests];
+
+  kln::point result;
+  clock_t t;
+  double time_taken;
 
   for (int i = 0; i < nr_tests; i++) {
     points[i] = rand_point();
@@ -85,9 +147,6 @@ void test_ProjectPointOnPlane(void) {
   for (int i = 0; i < nr_tests; i++) {
     planes[i] = rand_origin_unit_plane();
   }
-
-  clock_t t;
-  double time_taken;
 
   t = clock();
   for (int i = 0; i < nr_tests; i++) {
@@ -106,10 +165,13 @@ void test_ProjectPointOnPlane(void) {
  */
 void test_RotatePointAroundVector(void)
 {
-  kln::point result;
   kln::point points[nr_tests];
   vec3_t dirs[nr_tests];
   float angles[nr_tests]; // Angles in degrees
+
+  kln::point result;
+  clock_t t;
+  double time_taken;
 
   for (int i = 0; i < nr_tests; i++) {
     points[i] = rand_point();
@@ -117,9 +179,6 @@ void test_RotatePointAroundVector(void)
 
   rand_unit_vectors(dirs, nr_tests);
   rand_angles(angles, nr_tests);
-
-  clock_t t;
-  double time_taken;
 
   t = clock();
   for (int i = 0; i < nr_tests; i++)
@@ -133,6 +192,41 @@ void test_RotatePointAroundVector(void)
   printf("PGA C++ version took %f ms to execute \n", time_taken);
 }
 
+/**
+ * Executes the Ioquake and PGA version of the CM_TransformedPointContents function for a
+ * configured number of random inputs. For both version of the function, the total execution
+ * time for all generated inputs is measured and printed.
+ */
+void test_CM_TransformedPointContents(void)
+{
+  kln::point points[nr_tests];
+  kln::point origins[nr_tests];
+  kln::euler_angles ea_array[nr_tests];
+
+  clock_t t;
+  double time_taken;
+
+  clipHandle_t model = 5; // The value of "model" does not matter for testing purposes.
+
+  for (int i = 0; i < nr_tests; i++)
+  {
+    points[i] = rand_point();
+    origins[i] = rand_point();
+  }
+
+  rand_euler_angles(ea_array, nr_tests);
+
+  t = clock();
+  for (int i = 0; i < nr_tests; i++)
+  {
+    cpp_CM_TransformedPointContents(points[i], model, origins[i], ea_array[i]);
+  }
+
+  t = clock() - t;
+  time_taken = ((double)t) / CLOCKS_PER_SEC * 1000;
+  printf("PGA       version took %f ms to execute \n", time_taken);
+}
+
 int main() {
   srand(time(NULL));
 
@@ -140,6 +234,8 @@ int main() {
   test_ProjectPointOnPlane();
   printf("\nRotatePointAroundVector result\n");
   test_RotatePointAroundVector();
+  printf("\nCM_TransformedPointContents result\n");
+  test_CM_TransformedPointContents();
 
   return 0;
 }
